@@ -76,6 +76,15 @@ builder.Services.AddMediatR(cfg =>
 });
 
 var app = builder.Build();
+
+if (args.Contains("migrate"))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ContextDb>();
+    db.Database.Migrate();
+    return;
+}
+
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -87,7 +96,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHsts();
-app.UseHttpsRedirection();
 
 app.MapUserEndpoints();
 app.MapAuthEndpoints();
